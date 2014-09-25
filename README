@@ -1,0 +1,12 @@
+--EmDebug--
+
+Description
+===========
+
+EmDebug is a front-end interface for GDB designed for debug ARM Cortex-M based
+microcontrollers, allowing some advanced debug techniques like showing
+information about the current exception, pending exceptions, HardFault
+MemFault / BusFault / UsageFault information, peripheral's status, stack usage,
+GPIO view and much more!
+
+
