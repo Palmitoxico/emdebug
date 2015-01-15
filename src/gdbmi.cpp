@@ -24,3 +24,39 @@
  * or you may write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
+#include "gdbmi.h"
+
+gdbmi::gdbmi()
+{
+
+}
+
+gdbmi::~gdbmi()
+{
+
+}
+
+int gdbmi::load_elf(char *ELF_File)
+{
+
+}
+
+int gdbmi::target_connect(unsigned int Port)
+{
+
+}
+
+int gdbmi::target_disconnect()
+{
+
+}
+
+int gdbmi::target_reset()
+{
+
+}
+
+int gdbmi::close_elf()
+{
+
+}

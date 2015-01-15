@@ -24,3 +24,16 @@
  * or you may write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
+class gdbmi
+{
+public:
+	gdbmi();
+	~gdbmi();
+	int load_elf(char *ELF_File);
+	int target_connect(unsigned int Port);
+	int target_disconnect();
+	int target_reset();
+	int close_elf();
+private:
+	unsigned int Target_Port;
+};
