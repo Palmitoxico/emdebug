@@ -2,7 +2,7 @@ language: cpp
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libwxgtk3.0-dev cmake make
+  - sudo apt-get install -y libwxgtk3.0-dev cmake make g++
 
 install:
   - mkdir build
