@@ -10,3 +10,21 @@ MemFault / BusFault / UsageFault information, peripheral's status, stack usage,
 GPIO view and much more!
 
 
+How to build
+============
+
+Pre-requisites:
+
+- cmake
+- libwxgtk3.0-dev
+- g++
+- make
+
+Instructions:
+
+Make a build directory then use cmake to generate the makefile:
+
+emdebug$ mkdir build
+emdebug$ cd build
+build$ cmake ..
+build$ make
