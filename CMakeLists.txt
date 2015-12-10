@@ -12,8 +12,10 @@ include( "${wxWidgets_USE_FILE}" )
 
 add_library(gdbmi src/gdbmi.cpp)
 
+add_library(ctrlexe src/ctrlexe.cpp)
+
 add_library(simple_exception src/simple_exception.cpp)
 
 add_executable(emdebug src/main.cpp)
 
-target_link_libraries (emdebug gdbmi simple_exception ${wxWidgets_LIBRARIES})
+target_link_libraries (emdebug gdbmi simple_exception ctrlexe ${wxWidgets_LIBRARIES})
