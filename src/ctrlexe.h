@@ -25,7 +25,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 #include <string>
-#include <exception>
+#include <stdexcept>
+#include <string.h>
 #include "simple_exception.h"
 
 #ifndef CTRLEXE_HEADER
@@ -42,7 +43,7 @@ public:
 	void WriteString(const char *Str);
 	void WriteString(const std::string &Str);
 	int ReadBytes(char *buffer, int bsize);
-	void ReadLine(std::string &Str, char delimiter);
+	int ReadLine(std::string &Str, char delimiter);
 	void SetReadTimeout(int r_timeout);
 	bool IsRunning();
 private:

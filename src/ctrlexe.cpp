@@ -1,6 +1,6 @@
 /**
  * @file ctrlexe.cpp
- * @brief Library for control child processes
+ * @brief Library for controlling child processes
  */
 
 /*
@@ -78,9 +78,9 @@ void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 			_argv = new const char*[nargs + 1];
 			_argv[0] = Cmd;
 			_argv[nargs] = NULL;
-			for (nargs = 1; argv[nargs] != NULL; nargs++)
+			for (nargs = 1; argv[nargs - 1] != NULL; nargs++)
 			{
-				_argv[nargs] = argv[nargs];
+				_argv[nargs] = argv[nargs - 1];
 			}
 		}
 		close(child_err[0]);
@@ -94,7 +94,7 @@ void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 		close(proc_in[1]);
 
 		/*Pass the control to the process*/
-		if (execvp(_argv[0], (char**)argv) == -1)
+		if (execvp(_argv[0], (char**)_argv) == -1)
 		{
 			write(child_err[1], &errno, sizeof(int));
 			_exit(0);
@@ -124,7 +124,7 @@ void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 	}
 }
 
-void ctrlexe::ReadLine(std::string &Str, const char delimiter)
+int ctrlexe::ReadLine(std::string &Str, const char delimiter)
 {
 	fd_set set;
 	struct timeval timeout;
@@ -134,7 +134,7 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 	FD_SET(proc_out[0], &set);
 	Str = "";
 	auto start = std::chrono::steady_clock::now();
-	
+
 	if (proc_pid > 0)
 	{
 		if (read_timeout >= 0)
@@ -152,15 +152,13 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 					(std::chrono::steady_clock::now() - start);
 				if ((duration.count() >= read_timeout) && (read_timeout >= 0))
 				{
-					std::cout << duration.count() << std::endl;
 					throw std::runtime_error("Timeout!");
-					return;
 				}
 				if (rv != 0)
 				{
 					if (read(proc_out[0], buf, 1) == 0)
 					{
-						throw std::runtime_error("Read = 0!");
+						return -1;
 					}
 					else
 					{
@@ -171,7 +169,7 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 						}
 						else
 						{
-							return;
+							return Str.size();
 						}
 					}
 				}
@@ -183,7 +181,7 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 			{
 				if (read(proc_out[0], buf, 1) == 0)
 				{
-					throw std::runtime_error("Read = 0!");
+					return -1;
 				}
 				else
 				{
@@ -194,7 +192,7 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 					}
 					else
 					{
-						return;
+						return Str.size();
 					}
 				}
 			}
@@ -204,6 +202,7 @@ void ctrlexe::ReadLine(std::string &Str, const char delimiter)
 	{
 		throw std::runtime_error("Pid = -1");
 	}
+	return 0;
 }
 
 int ctrlexe::ReadBytes(char *buffer, int bsize)
@@ -241,7 +240,7 @@ void ctrlexe::KillProcess()
 
 void ctrlexe::WriteString(const char *Str)
 {
-	if (write(proc_in[1], Str, sizeof(Str)) < 0)
+	if (write(proc_in[1], Str, strlen(Str)) < 0)
 	{
 		throw std::runtime_error("Write!");
 	}
