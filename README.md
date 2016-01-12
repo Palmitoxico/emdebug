@@ -4,7 +4,7 @@
 
 ## Description
 
-EmDebug is a front-end interface for GDB + OpenOCD, designed for debug ARM Cortex-M based microcontrollers. GDB is ok when debugging most of the code logic, but isn't much convenient when you need to inspect peripheral's registers, GPIO or what execution mode is current.
+EmDebug is a front-end interface for GDB + OpenOCD, designed for debug ARM Cortex-M based microcontrollers. GDB is ok when debugging most of the code logic, but isn't much convenient when you need to inspect peripheral's registers, GPIO or what execution mode is the current.
 
 Planned features:
 
@@ -30,7 +30,9 @@ Instructions:
 
 Make a build directory then use cmake to generate the makefile:
 
+```
 emdebug$ mkdir build
 emdebug$ cd build
 build$ cmake ..
 build$ make
+```
