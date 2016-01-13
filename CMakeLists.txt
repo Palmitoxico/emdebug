@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
 project(EmDebug)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(wxWidgets 3.0.0 REQUIRED COMPONENTS stc gl aui adv core net base xml)
