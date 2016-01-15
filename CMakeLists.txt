@@ -16,10 +16,8 @@ add_library(gdbmi src/gdbmi.cpp)
 
 add_library(ctrlexe src/ctrlexe.cpp)
 
-add_library(simple_exception src/simple_exception.cpp)
-
 add_executable(emdebug src/main.cpp)
 
-set_property(TARGET emdebug ctrlexe gdbmi simple_exception PROPERTY CXX_STANDARD 11)
+set_property(TARGET emdebug ctrlexe gdbmi PROPERTY CXX_STANDARD 11)
 
-target_link_libraries (emdebug gdbmi simple_exception ctrlexe ${wxWidgets_LIBRARIES})
+target_link_libraries (emdebug gdbmi ctrlexe ${wxWidgets_LIBRARIES})
