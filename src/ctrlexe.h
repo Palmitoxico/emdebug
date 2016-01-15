@@ -25,9 +25,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 #include <string>
-#include <stdexcept>
 #include <string.h>
-#include "simple_exception.h"
 
 #ifndef CTRLEXE_HEADER
 #define CTRLEXE_HEADER
@@ -37,11 +35,11 @@ class ctrlexe
 public:
 	ctrlexe();
 	~ctrlexe();
-	void StartProcess(const char *Cmd, char const * const argv[]);
-	void KillProcess();
-	void WriteBytes(const char *buffer, int nbytes);
-	void WriteString(const char *Str);
-	void WriteString(const std::string &Str);
+	int StartProcess(const char *Cmd, char const * const argv[]);
+	int KillProcess();
+	int WriteBytes(const char *buffer, int nbytes);
+	int WriteString(const char *Str);
+	int WriteString(const std::string &Str);
 	int ReadBytes(char *buffer, int bsize);
 	int ReadLine(std::string &Str, char delimiter);
 	void SetReadTimeout(int r_timeout);

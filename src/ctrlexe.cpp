@@ -47,13 +47,16 @@ ctrlexe::~ctrlexe()
 	KillProcess();
 }
 
-void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
+int ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 {
 	int child_err[2];
 	int count, err;
 	if (IsRunning())
 	{
-		return;
+		/*
+		  The process is already running
+		 */
+		return -3;
 	}
 	pipe(proc_in);
 	pipe(proc_out);
@@ -103,7 +106,10 @@ void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 
 	else if (proc_pid == -1)
 	{
-		throw std::runtime_error("Unable to fork!");
+		/*
+		  Fork error
+		 */
+		return -1;
 	}
 	else
 	{
@@ -115,13 +121,17 @@ void ctrlexe::StartProcess(const char *Cmd, char const * const argv[])
 
 		if (count)
 		{
-			throw std::runtime_error(strerror(err));
+			/*
+			  execvp error
+			 */
+			return -2;
 			proc_pid = -1;
 		}
 		close(child_err[0]);
 		close(proc_in[0]);
 		close(proc_out[1]);
 	}
+	return 0;
 }
 
 int ctrlexe::ReadLine(std::string &Str, const char delimiter)
@@ -146,31 +156,37 @@ int ctrlexe::ReadLine(std::string &Str, const char delimiter)
 				rv = select(proc_out[0] + 1, &set, NULL, NULL, &timeout);
 				if (rv == -1)
 				{
-					throw std::runtime_error("Erro select!");
+					/*
+					  Some error ocurred during the select() call
+					 */
+					return -2;
 				}
 				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>
 					(std::chrono::steady_clock::now() - start);
 				if ((duration.count() >= read_timeout) && (read_timeout >= 0))
 				{
-					throw std::runtime_error("Timeout!");
+					/*
+					  Timeout
+					 */
+					return -1;
 				}
-				if (rv != 0)
+				if (read(proc_out[0], buf, 1) == 0)
 				{
-					if (read(proc_out[0], buf, 1) == 0)
+					/*
+					  End of pipe
+					 */
+					return -3;
+				}
+				else
+				{
+					buf[1] = 0;
+					if (buf[0] != delimiter)
 					{
-						return -1;
+						Str += buf;
 					}
 					else
 					{
-						buf[1] = 0;
-						if (buf[0] != delimiter)
-						{
-							Str += buf;
-						}
-						else
-						{
-							return Str.size();
-						}
+						return Str.size();
 					}
 				}
 			}
@@ -181,7 +197,10 @@ int ctrlexe::ReadLine(std::string &Str, const char delimiter)
 			{
 				if (read(proc_out[0], buf, 1) == 0)
 				{
-					return -1;
+					/*
+					  End of pipe
+					 */
+					return -3;
 				}
 				else
 				{
@@ -200,7 +219,10 @@ int ctrlexe::ReadLine(std::string &Str, const char delimiter)
 	}	
 	else
 	{
-		throw std::runtime_error("Pid = -1");
+		/*
+		  The process isn't runing
+		 */
+		return -4;
 	}
 	return 0;
 }
@@ -218,7 +240,10 @@ int ctrlexe::ReadBytes(char *buffer, int bsize)
 		timeout.tv_usec = (read_timeout % 1000)*1000;
 		if (select(proc_out[0] + 1, &set, NULL, NULL, &timeout) == 0)
 		{
-			throw std::runtime_error("Timeout!");
+			/*
+			  Timeout
+			 */
+			return -2;
 		}
 	}
 	return read(proc_out[0], buffer, bsize);
@@ -229,37 +254,41 @@ void ctrlexe::SetReadTimeout(int timeout)
 	read_timeout = timeout;
 }
 
-void ctrlexe::KillProcess()
+int ctrlexe::KillProcess()
 {
 	if (proc_pid != -1)
 	{
 		kill(proc_pid, SIGTERM);
 		proc_pid = -1;
 	}
+	return 0;
 }
 
-void ctrlexe::WriteString(const char *Str)
+int ctrlexe::WriteString(const char *Str)
 {
 	if (write(proc_in[1], Str, strlen(Str)) < 0)
 	{
-		throw std::runtime_error("Write!");
+			return -1;
 	}
+	else return 0;
 }
 
-void ctrlexe::WriteString(const std::string &Str)
+int ctrlexe::WriteString(const std::string &Str)
 {
 	if (write(proc_in[1], Str.c_str(), Str.size()) < 0)
 	{
-		throw std::runtime_error("Write!");
+			return -1;
 	}
+	else return 0;
 }
 
-void ctrlexe::WriteBytes(const char *buffer, int nbytes)
+int ctrlexe::WriteBytes(const char *buffer, int nbytes)
 {
 	if (write(proc_in[1], buffer, nbytes) < 0)
 	{
-		throw std::runtime_error("Write!");
+		return -1;
 	}
+	else return 0;
 }
 
 bool ctrlexe::IsRunning()
